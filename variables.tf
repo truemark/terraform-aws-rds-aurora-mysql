@@ -232,3 +232,15 @@ variable "kms_key_id" {
   type = string
   default = null
 }
+
+variable "performance_insights_enabled" {
+  description = "Specifies whether Performance Insights is enabled or not"
+  type        = bool
+  default     = null
+}
+
+variable "performance_insights_retention_period" {
+  description = "Amount of time in days to retain Performance Insights data. Either 7 (7 days) or 731 (2 years)"
+  type        = number
+  default     = null
+}
