@@ -246,7 +246,7 @@ variable "performance_insights_retention_period" {
 }
 
 variable "auto_minor_version_upgrade" {
-  description = "Indicates that minor engine upgrades will be applied automatically to the DB instance during the maintenance window. Default `true`"
+  description = "Indicates that minor engine upgrades will be applied automatically to the DB instance during the maintenance window. Default `false`"
   type        = bool
   default     = false
 }
