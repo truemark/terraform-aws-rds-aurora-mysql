@@ -1,8 +1,8 @@
-# AWS RDS Aurora PostgreSQL
+# AWS RDS Aurora MySQL
 
-This terraform module creates a provisioned Aurora RDS instance with PostgreSQL
+This terraform module creates a provisioned Aurora RDS instance with MySQL
 compatability. This module extends the functionality of the module
-"terraform-aws-modules/rds-aurora/aws" providing PostgreSQL specific defaults
+"terraform-aws-modules/rds-aurora/aws" providing MySQL specific defaults
 and the ability to create an optional RDS proxy.
 
 ## Quick Links
@@ -11,20 +11,17 @@ and the ability to create an optional RDS proxy.
 ## Example Usage
 ```
 module "db" {
-  source                          = "truemark/rds-aurora-postgres/aws"
-  version                         = "1.2.1"
-  name                            = "dbname"
-  vpc_id                          = "vpc-0a6c8fae7776adb32"
-  subnets                         = [ "subnet-0613436966e999", "subnet-0613436966ea998" ]
-  family                          = "aurora-postgresql14"
-  engine_version                  = "14.6"
-  instance_class                  = "db.r6g.2xlarge"
-  database_name                   = "dbname"
-  replica_count                   = 0
-  deletion_protection             = true
-  tags                            = local.tags
-  db_parameters                   = local.db_parameters
-  rds_cluster_parameters          = local.cluster_parameters
+  source                 = "truemark/rds-aurora-mysql/aws"
+  version                = "0.0.4"
+  database_name          = "dbname"
+  deletion_protection    = true
+  engine_version         = "8.0.mysql_aurora.3.02.2"
+  family                 = "aurora-mysql8.0"
+  instance_class         = "db.t4g.large"
+  name                   = "dbname"
+  replica_count          = 0
+  subnets                = [ "subnet-0613436966e999", "subnet-0613436966ea998" ]
+  vpc_id                 = "vpc-0a6c8fae7776adb32"
 }
 ```
 ## Parameters
