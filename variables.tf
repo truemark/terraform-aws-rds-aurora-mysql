@@ -237,6 +237,12 @@ variable "replica_count" {
   default     = 1
 }
 
+variable "security_group_rules" {
+  description = "Map of security group rules to add to the cluster security group created"
+  type        = any
+  default     = {}
+}
+
 variable "security_group_tags" {
   description = "Additional tags for the security group"
   type        = map(string)

@@ -26,6 +26,7 @@ module "db" {
   master_username                 = "admin"
   name                            = local.name
   replica_count                   = local.environment == "prod" ? 1 : 0
+  security_group_rules            = local.security_group_rules
   skip_final_snapshot             = true
   store_master_password_as_secret = false
   subnets                         = local.subnets
@@ -78,6 +79,7 @@ The following parameters are supported:
 - rds_cluster_parameter_group_tags
 - rds_cluster_parameters
 - replica_count
+- security_group_rules
 - security_group_tags
 - share
 - share_tags

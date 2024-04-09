@@ -10,6 +10,22 @@ locals {
       "automation:component-vendor" = "TrueMark",
       "backup:policy"               = "default-week",
   })
+  security_group_rules = [
+    {
+      type        = "ingress"
+      from_port   = 3306
+      to_port     = 3306
+      protocol    = "tcp"
+      cidr_blocks = var.ingress_cidrs
+    },
+    {
+      type        = "egress"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_blocks = var.egress_cidrs
+    }
+  ]
 }
 
 resource "aws_db_parameter_group" "db" {
@@ -44,30 +60,6 @@ resource "aws_rds_cluster_parameter_group" "db" {
   tags = merge(var.tags, var.rds_cluster_parameter_group_tags)
 }
 
-resource "aws_security_group" "mysql_sg" {
-  name        = "mysql_security_group"
-  description = "Allow inbound traffic"
-  vpc_id      = var.vpc_id
-  #vpc_id      = aws_vpc.main.id
-
-  ingress {
-    from_port   = 3306
-    to_port     = 3306
-    protocol    = "tcp"
-    cidr_blocks = var.ingress_cidrs #Change This
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = var.egress_cidrs #Change This
-  }
-
-  tags = {
-    Name = "mysql_sg"
-  }
-}
 
 module "db" {
   # https://registry.terraform.io/modules/terraform-aws-modules/rds-aurora/aws/latest
@@ -95,7 +87,7 @@ module "db" {
   instances                             = local.instances
   kms_key_id                            = var.kms_key_id
   manage_master_user_password           = var.manage_master_user_password
-  master_password                       = var.master_password
+  master_password                       = var.manage_master_user_password ? null : random_password.root_password.result 
   master_username                       = var.master_username
   monitoring_interval                   = 60
   name                                  = var.name
@@ -103,6 +95,7 @@ module "db" {
   performance_insights_retention_period = var.performance_insights_retention_period
   preferred_backup_window               = var.preferred_backup_window
   preferred_maintenance_window          = var.preferred_maintenance_window
+  security_group_rules                  = local.security_group_rules
   security_group_tags                   = var.security_group_tags
   skip_final_snapshot                   = var.skip_final_snapshot
   snapshot_identifier                   = var.snapshot_identifier
@@ -110,7 +103,6 @@ module "db" {
   subnets                               = var.subnets
   tags                                  = var.tags
   vpc_id                                = var.vpc_id
-  vpc_security_group_ids                = [aws_security_group.mysql_sg.id]
 }
 
 resource "aws_ram_resource_share" "db" {
@@ -121,22 +113,30 @@ resource "aws_ram_resource_share" "db" {
 }
 
 resource "aws_secretsmanager_secret" "db" {
-  count       = var.create && var.store_master_password_as_secret ? 1 : 0
+  count = var.create && var.manage_master_user_password ? 0 : 1
   name_prefix = var.master_password_secret_name_prefix == null ? "database/${var.name}/master-" : var.master_password_secret_name_prefix
   description = "Master password for ${var.name}"
   tags        = merge(var.tags, var.password_secret_tags)
 }
 
 resource "aws_secretsmanager_secret_version" "db" {
-  count     = var.create && var.store_master_password_as_secret ? 1 : 0
+  count = var.create && var.manage_master_user_password ? 0 : 1
   secret_id = aws_secretsmanager_secret.db[count.index].id
   secret_string = jsonencode({
-    host     = module.db.cluster_endpoint  #try(aws_rds_cluster.this[0].endpoint, "")
+    host     = module.db.cluster_endpoint
     port     = module.db.cluster_port
     dbname   = module.db.cluster_database_name
     username = module.db.cluster_master_username
-    password = module.db.cluster_master_password
+    password = random_password.root_password.result #module.db.cluster_master_password
   })
+}
+
+resource "random_password" "root_password" {
+  length      = 16
+  special     = false
+  min_upper   = 1
+  min_lower   = 1
+  min_numeric = 0
 }
 
 module "proxy" {
