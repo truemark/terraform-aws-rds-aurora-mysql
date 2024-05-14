@@ -4,7 +4,7 @@ output "instances" {
 
 ###############################################################################
 # The following parameters are copied from
-# https://github.com/terraform-aws-modules/terraform-aws-rds-aurora/blob/v6.1.3/outputs.tf
+# https://github.com/terraform-aws-modules/terraform-aws-rds-aurora/blob/v9.2.1/outputs.tf
 ###############################################################################
 
 # aws_db_subnet_group
@@ -72,6 +72,11 @@ output "cluster_master_username" {
   sensitive   = true
 }
 
+output "cluster_master_user_secret" {
+  description = "The generated database master user secret when `manage_master_user_password` is set to `true`"
+  value       = module.db.cluster_master_user_secret
+}
+
 output "cluster_hosted_zone_id" {
   description = "The Route53 Hosted Zone ID of the endpoint"
   value       = module.db.cluster_hosted_zone_id
@@ -115,4 +120,44 @@ output "enhanced_monitoring_iam_role_unique_id" {
 output "security_group_id" {
   description = "The security group ID of the cluster"
   value       = module.db.security_group_id
+}
+
+# Cluster Parameter Group
+output "db_cluster_parameter_group_arn" {
+  description = "The ARN of the DB cluster parameter group created"
+  value       = module.db.db_cluster_parameter_group_arn
+}
+
+output "db_cluster_parameter_group_id" {
+  description = "The ID of the DB cluster parameter group created"
+  value       = module.db.db_cluster_parameter_group_id
+}
+
+# DB Parameter Group
+output "db_parameter_group_arn" {
+  description = "The ARN of the DB parameter group created"
+  value       = module.db.db_parameter_group_arn 
+}
+
+output "db_parameter_group_id" {
+  description = "The ID of the DB parameter group created"
+  value       = module.db.db_parameter_group_id
+}
+
+# CloudWatch Log Group
+output "db_cluster_cloudwatch_log_groups" {
+  description = "Map of CloudWatch log groups created and their attributes"
+  value       = module.db.db_cluster_cloudwatch_log_groups
+}
+
+# Cluster Activity Stream
+output "db_cluster_activity_stream_kinesis_stream_name" {
+  description = "The name of the Amazon Kinesis data stream to be used for the database activity stream"
+  value       = module.db.db_cluster_activity_stream_kinesis_stream_name
+}
+
+# Managed Secret Rotation
+output "db_cluster_secretsmanager_secret_rotation_enabled" {
+  description = "Specifies whether automatic rotation is enabled for the secret"
+  value       = module.db.db_cluster_secretsmanager_secret_rotation_enabled
 }
