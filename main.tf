@@ -101,7 +101,7 @@ module "db" {
   snapshot_identifier                   = var.snapshot_identifier
   storage_encrypted                     = true
   subnets                               = var.subnets
-  tags                                  = var.tags
+  tags                                  = local.tags
   vpc_id                                = var.vpc_id
 }
 
