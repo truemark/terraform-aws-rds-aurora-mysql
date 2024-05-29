@@ -87,7 +87,7 @@ module "db" {
   instances                             = local.instances
   kms_key_id                            = var.kms_key_id
   manage_master_user_password           = var.manage_master_user_password
-  master_password                       = var.manage_master_user_password ? null : random_password.root_password.result 
+  master_password                       = var.manage_master_user_password ? null : (var.master_password != null ? var.master_password : random_password.root_password.result) 
   master_username                       = var.master_username
   monitoring_interval                   = 60
   name                                  = var.name
@@ -101,7 +101,7 @@ module "db" {
   snapshot_identifier                   = var.snapshot_identifier
   storage_encrypted                     = true
   subnets                               = var.subnets
-  tags                                  = var.tags
+  tags                                  = local.tags
   vpc_id                                = var.vpc_id
 }
 
@@ -127,7 +127,7 @@ resource "aws_secretsmanager_secret_version" "db" {
     port     = module.db.cluster_port
     dbname   = module.db.cluster_database_name
     username = module.db.cluster_master_username
-    password = random_password.root_password.result #module.db.cluster_master_password
+    password = var.master_password != null ? var.master_password : random_password.root_password.result 
   })
 }
 

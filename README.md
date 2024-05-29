@@ -85,7 +85,6 @@ The following parameters are supported:
 - share_tags
 - skip_final_snapshot
 - snapshot_identifier
-- store_master_password_as_secret
 - subnets
 - tags
 - vpc_id
