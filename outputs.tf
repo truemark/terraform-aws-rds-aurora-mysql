@@ -136,7 +136,7 @@ output "db_cluster_parameter_group_id" {
 # DB Parameter Group
 output "db_parameter_group_arn" {
   description = "The ARN of the DB parameter group created"
-  value       = module.db.db_parameter_group_arn 
+  value       = module.db.db_parameter_group_arn
 }
 
 output "db_parameter_group_id" {
